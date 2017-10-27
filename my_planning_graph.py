@@ -303,13 +303,20 @@ class PlanningGraph():
         :return:
             adds A nodes to the current level in self.a_levels[level]
         """
-        # TODO add action A level to the planning graph as described in the Russell-Norvig text
-        # 1. determine what actions to add and create those PgNode_a objects
-        # 2. connect the nodes to the previous S literal level
-        # for example, the A0 level will iterate through all possible actions for the problem and add a PgNode_a to a_levels[0]
-        #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
-        #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
-        #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
+        action_nodes = []
+        previous_level = self.s_levels[level]
+
+        for action in self.all_actions:
+            action_node = PgNode_a(action)
+            if action_node.prenodes.issubset(previous_level):
+                action_nodes.append(action_node)
+
+                for state_node in previous_level:
+                    if state_node in action_node.prenodes:
+                        state_node.children.add(action_node)
+                        action_node.parents.add(state_node)
+
+        self.a_levels.append(action_nodes)
 
     def add_literal_level(self, level):
         """ add an S (literal) level to the Planning Graph
