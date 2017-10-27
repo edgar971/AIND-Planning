@@ -64,15 +64,14 @@ class AirCargoProblem(Problem):
             for a in self.airports:
                 for p in self.planes:
                     for c in self.cargos:
-                        precond_pos = [expr("At({}, {})".format(c, a)),
-                                        expr("At({}, {})".format(p, a)),
-                                        ]
+                        precond_pos = [expr("At({}, {})".format(p, a)),
+                                       expr("At({}, {})".format(c, a)),]
                         precond_neg = []
                         effect_add = [expr("In({}, {})".format(c, p))]
                         effect_rem = [expr("At({}, {})".format(c, a))]
                         load = Action(expr("Load({}, {}, {})".format(c, p, a)),
-                                [precond_pos, precond_neg],
-                                [effect_add, effect_rem])
+                                     [precond_pos, precond_neg],
+                                     [effect_add, effect_rem])
                         loads.append(load)
             return loads
 
@@ -85,15 +84,14 @@ class AirCargoProblem(Problem):
             for a in self.airports:
                 for p in self.planes:
                     for c in self.cargos:
-                        precond_pos = [expr("In({}, {})".format(c, a)),
-                                        expr("At({}, {})".format(p, a)),
-                                        ]
+                        precond_pos = [expr("At({}, {})".format(p, a)),
+                                       expr("In({}, {})".format(c, p)),]
                         precond_neg = []
                         effect_add = [expr("At({}, {})".format(c, a))]
                         effect_rem = [expr("In({}, {})".format(c, p))]
                         unload = Action(expr("Unload({}, {}, {})".format(c, p, a)),
-                                [precond_pos, precond_neg],
-                                [effect_add, effect_rem])
+                                     [precond_pos, precond_neg],
+                                     [effect_add, effect_rem])
                         unloads.append(unload)
             
             return unloads
@@ -198,13 +196,10 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
         count = 0
-        for c in node.state:
-            if c is "T":
+        for goal in self.goal:
+            if goal not in kb.clauses:
                 count += 1
-        count -= len(self.goal)
-
         return count
 
 
